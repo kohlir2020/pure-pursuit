@@ -62,6 +62,12 @@ def generate(config: TrajectoryConfig, start_vel: float, start_heading: float,
     rampdown_time = (new_max_vel - goal_vel) / config.max_a
     rampdown_dist = new_max_vel * rampdown_time - 0.5 * config.max_a * math.pow(rampdown_time, 2)
     cruise_dist = goal_pos - rampup_time - rampdown_time
+    
+    #if constant velocity distance < 0, use triangular vel profile
+    if (cruise_dist < 0):
+        rampup_time, rampdown_time = math.sqrt((goal_pos / config.max_a))
+        cruise_dist = 0
+        new_max_vel = config.max_a * rampup_time
 
     seg_length = int((rampup_time + rampdown_time + (cruise_dist / new_max_vel)) / config.interval + 0.5)
 
